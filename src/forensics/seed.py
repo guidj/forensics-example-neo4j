@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 import os.path
 import random
 import uuid
@@ -334,3 +335,37 @@ def seed():
 
     print('Seeding employment data')
     run_transaction(employment_data)
+
+
+def dump():
+
+    class JSEncoder(json.JSONEncoder):
+        def default(self, o):
+            return o.__dict__
+
+    people, phone_activity, flight_activity, employment_data = generate_data()
+
+    base_dir = os.path.join(config.PROJECT_BASE, 'data', 'out')
+
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
+
+    with open(os.path.join(base_dir, 'people.json'), 'w') as fp:
+
+        json.dump(people, fp, indent=3, cls=JSEncoder)
+
+    with open(os.path.join(base_dir, 'calls.json'), 'w') as fp:
+
+        json.dump(phone_activity, fp, indent=3, cls=JSEncoder)
+
+    with open(os.path.join(base_dir, 'flights.json'), 'w') as fp:
+
+        json.dump(flight_activity, fp, indent=3, cls=JSEncoder)
+
+    with open(os.path.join(base_dir, 'employment.json'), 'w') as fp:
+
+        json.dump(employment_data, fp, indent=3, cls=JSEncoder)
+
+
+if __name__ == '__main__':
+    dump()
