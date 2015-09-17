@@ -58,3 +58,17 @@ This will delete existing data on the database, and seed new data.
 
 ##Running pattern analysis
 
+```
+app-env/bin/python src/forensics/main.py --pattern X
+```
+
+Where X is the pattern you want to find. Currently, there are 5 options:
+
+    1: Find the top 20 people that took more than 1 flight between ~Jan - Jun 2014, to any destination.'
+       Results are ordered by number of flights to each country',
+    2: Find people that took more than 1 flight to any country each month, between ~Jan - Aug 2014',
+    3: Find a phone number that has made calls on Wednesdays, between 6pm and 10pm to the representative of XYZ',
+    4: Among the people that called the representative, find those that have flown in or out of one of enterprise XYZ offices in Japan, or the UK
+    5: Among the people that called the representative, and flew in or out of one of Enterprise XYZ\'s subsidiaries, find those that have an employment history at WT Enterprises'
+    
+If you don't provide a value for X, all options are executed.
