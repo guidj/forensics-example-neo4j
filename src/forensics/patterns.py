@@ -1,16 +1,17 @@
 import datetime
+import time
 
 from forensics.utils import neo4j
 
 PATTERNS = {
-    1: '\n**Find the top 20 people that took more than 1 flight between ~Jan - Jun 2015, to any destination.'
+    1: '\n**Find the top 20 people that took more than 1 flight between ~Jan - Jun 2014, to any destination.'
        ' Results are ordered by number of flights to each country',
     2: '\n**Find people that took more than 1 flight to any country each month, between ~Jan - Aug 2014',
     3: '\n**Find a phone number that has made calls on Wednesdays, between 6pm and 10pm to the representative of XYZ',
     4: '\n**Among the people that called the representative, find those that have flown in or out of '
        'one of enterprise XYZ offices in Japan, or the UK',
-    5: '\n**Among the people that called the represented, and flew in or out of one of Enterprise XYZ\'s subsidiaries'
-       ', find those that have an employment record at WT Enterprises'
+    5: '\n**Among the people that called the representative, and flew in or out of one of Enterprise XYZ\'s subsidiaries'
+       ', find those that have an employment history at WT Enterprises'
 }
 
 
@@ -45,6 +46,8 @@ def one():
 
     statement = '\n'.join(statements).format()
 
+    print(statement)
+
     start_date = datetime.datetime(2014, 1, 1)
     end_date = datetime.datetime(2014, 6, 30)
 
@@ -57,6 +60,8 @@ def one():
 
     query = neo4j.Query(statement, params)
 
+    start = time.time()*1000
+
     with neo4j.Transaction() as tx:
 
         rs = tx.execute(query)
@@ -68,10 +73,14 @@ def one():
         else:
             print('\t', 'No matching patterns found')
 
+    end = time.time()*1000
+
+    print('Took {0:.2f}ms'.format(end-start))
+
 
 def two():
 
-    # find people that took more than 1 flight to any country each month, for the past ~8 months
+    # find people that took more than 1 flight to any destination each month, for the past ~8 months
     msg = PATTERNS[2]
     print(msg)
 
@@ -84,6 +93,8 @@ def two():
     ]
 
     statement = '\n'.join(statements).format()
+
+    print(statement)
 
     queries = []
     start_date = datetime.datetime(2014, 8, 1)
@@ -99,6 +110,8 @@ def two():
 
         query = neo4j.Query(statement, params)
         queries.append(query)
+
+    start = time.time()*1000
 
     with neo4j.BatchTransaction() as tx:
 
@@ -123,6 +136,10 @@ def two():
             else:
                 print('\t', 'No matching patterns found')
 
+    end = time.time()*1000
+
+    print('Took {0:.2f}ms'.format(end-start))
+
 
 def three():
 
@@ -140,6 +157,8 @@ def three():
 
     statement = '\n'.join(statements).format()
 
+    print(statement)
+
     query = neo4j.Query(
         statement,
         [
@@ -147,6 +166,8 @@ def three():
             neo4j.Parameter('weekday', 2)
         ]
     )
+
+    start = time.time()*1000
 
     with neo4j.Transaction() as tx:
 
@@ -158,6 +179,10 @@ def three():
                 print('\t', row)
         else:
             print('\t', 'No matching patterns found')
+
+    end = time.time()*1000
+
+    print('Took {0:.2f}ms'.format(end-start))
 
 
 def four():
@@ -173,21 +198,27 @@ def four():
         '(repPhone :`PhoneNumber` {{number: {{repNumber}}}})',
         'WHERE call.weekday = {{weekday}}',
         'WITH poi, COUNT(call) AS numberOfCalls',
-        'MATCH (poi)-[:TOOK]->(flight :`Flight`)-[:TO]-(:`City`)-[:IN]->(country :`Country`)'
-        'WHERE country.name IN {{countries}}',
+        'MATCH (poi)-[:TOOK]->(flight :`Flight`)-[:TO]-(:`City`)-[:IN]->(country :`Country`)',
+        'WHERE country.name IN {{countries}} AND flight.timestamp >= {{startDate}} AND flight.timestamp < {{endDate}}',
         'RETURN poi.name as subjectName, poi.id AS ID, COUNT(flight) AS flights, country.name AS country'
     ]
 
     statement = '\n'.join(statements).format()
+
+    print(statement)
 
     query = neo4j.Query(
         statement,
         [
             neo4j.Parameter('repNumber', '+911-123-987-468'),
             neo4j.Parameter('weekday', 2),
-            neo4j.Parameter('countries', ['Japan', 'UK'])
+            neo4j.Parameter('countries', ['Japan', 'UK']),
+            neo4j.Parameter('startDate', datetime.datetime(2014, 1, 1).timestamp()),
+            neo4j.Parameter('endDate', datetime.datetime(2014, 12, 31).timestamp())
         ]
     )
+
+    start = time.time()*1000
 
     with neo4j.Transaction() as tx:
 
@@ -199,6 +230,10 @@ def four():
                 print('\t', row)
         else:
             print('\t', 'No matching patterns found')
+
+    end = time.time()*1000
+
+    print('Took {0:.2f}ms'.format(end-start))
 
 
 def five():
@@ -213,16 +248,17 @@ def five():
         'WHERE call.weekday = {{weekday}}',
         'WITH poi, COUNT(call) AS numberOfCalls',
         'MATCH (poi)-[:TOOK]->(flight :`Flight`)-[:TO]-(:`City`)-[:IN]->(country :`Country`)'
-        'WHERE country.name IN {{countries}}',
+        'WHERE country.name IN {{countries}} AND flight.timestamp >= {{startDate}} AND flight.timestamp < {{endDate}}',
         'WITH poi',
         'MATCH (poi)-[employment :EMPLOYEE_AT]->(company: `Company` {{name: {{companyName}} }})',
         'WHERE employment.since < {{activitiesStartPeriod}} OR employment.until > {{activitiesStartPeriod}}',
         'WITH DISTINCT employment, poi, company',
-        'RETURN poi.name as subjectName, poi.id AS ID, employment.since AS since, employment.until AS until, '
-        'company.name AS company'
+        'RETURN poi.name as subjectName, poi.id AS ID, employment.since AS since, employment.until AS until'
     ]
 
     statement = '\n'.join(statements).format()
+
+    print(statement)
 
     query = neo4j.Query(
         statement,
@@ -231,28 +267,35 @@ def five():
             neo4j.Parameter('weekday', 2),
             neo4j.Parameter('countries', ['Japan', 'UK']),
             neo4j.Parameter('companyName', 'WT Enterprises'),
+            neo4j.Parameter('startDate', datetime.datetime(2014, 1, 1).timestamp()),
+            neo4j.Parameter('endDate', datetime.datetime(2014, 12, 31).timestamp()),
             neo4j.Parameter('activitiesStartPeriod', datetime.datetime(2014, 1, 1).timestamp())
         ]
     )
+
+    start = time.time()*1000
 
     with neo4j.Transaction() as tx:
 
         rs = tx.execute(query)
 
         if rs:
-            print('\t', ['Name', 'ID', 'Company', 'Since', 'Until'])
+            print('\t', ['Name', 'ID', 'Since', 'Until'])
             for row in rs:
                 print(
                     '\t',
                     [
                         row[0], row[1],
-                        row[4],
                         datetime.datetime.fromtimestamp(row[2]).strftime('%Y-%m-%d'),
                         datetime.datetime.fromtimestamp(row[3]).strftime('%Y-%m-%d')
                     ]
                 )
         else:
             print('\t', 'No matching patterns found')
+
+    end = time.time()*1000
+
+    print('Took {0:.2f}ms'.format(end-start))
 
 
 def run_analysis(pattern):
