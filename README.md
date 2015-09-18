@@ -72,3 +72,10 @@ Where X is the pattern you want to find. Currently, there are 5 options:
     5: Among the people that called the representative, and flew in or out of one of Enterprise XYZ\'s subsidiaries, find those that have an employment history at WT Enterprises'
     
 If you don't provide a value for X, all options are executed.
+
+
+##Visualizing data
+
+To visualize flights and phone call data, you first need to generate a small sample. 
+The [prep.py](src/html/prep.py) script. It will create files that the [index.html](src/html/index.html) will use to generate
+visualizations. You can then open the index.html file and visualize the randomly generated sample.
