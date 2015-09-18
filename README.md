@@ -1,8 +1,14 @@
 #Forensics Example, using Neo4j
 
-Finding patterns in data: multi-domain graphs
+Finding connections in data: multi-domain graphs
 
 ##Generating data files
+
+First, build the environment:
+
+```
+bash scripts/build-env.sh
+```
 
 Run the seed.py script: 
 

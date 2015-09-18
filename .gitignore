@@ -2,4 +2,13 @@ app-env/
 .idea
 
 *.pyc
-
+data/out/
+src/html/calls.json
+src/html/countries.csv
+src/html/flare.json
+src/html/flights.json
+src/html/matrix.json
+src/html/mod.html
+src/html/readme-flare-imports.json
+src/html/style.css
+src/html/teams.csv
