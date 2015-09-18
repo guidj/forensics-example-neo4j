@@ -88,7 +88,7 @@ def prep_call_sample():
 if __name__ == '__main__':
 
     # flight sample data
-    # prep_flight_sample()
+    prep_flight_sample()
 
     # call sample data
     prep_call_sample()
