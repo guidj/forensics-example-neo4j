@@ -1,6 +1,6 @@
 #Forensics Example, using Neo4j
 
-Finding connections in data: multi-domain graphs
+[Finding connections in data: multi-domain graphs](https://thinkingthread.com/connecting-data-with-multi-domain-graphs/)
 
 ##Generating data files
 
