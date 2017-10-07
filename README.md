@@ -1,8 +1,8 @@
-#Forensics Example, using Neo4j
+# Forensics Example, using Neo4j
 
 [Finding connections in data: multi-domain graphs](https://thinkingthread.com/connecting-data-with-multi-domain-graphs/)
 
-##Generating data files
+## Generating data files
 
 First, build the environment:
 
@@ -50,7 +50,7 @@ Data fields:
   - **since**: Date of employment. Unix timestamp. Number
   - **until**: Date employment ended. Number. -1 is for current employment
 
-##Seeding
+## Seeding
 
 Before seeding, make sure the connection settings on the `config.ini` file for Neo4j are correct.
 
@@ -62,7 +62,7 @@ app-env/bin/python src/forensics/main.py --seed yes
 
 This will delete existing data on the database, and seed new data.
 
-##Running pattern analysis
+## Running pattern analysis
 
 ```
 app-env/bin/python src/forensics/main.py --pattern X
@@ -80,7 +80,7 @@ Where X is the pattern you want to find. Currently, there are 5 options:
 If you don't provide a value for X, all options are executed.
 
 
-##Visualizing data
+## Visualizing data
 
 To visualize flights and phone call data, you first need to generate a small sample. 
 The [prep.py](src/html/prep.py) script. It will create files that the [index.html](src/html/index.html) will use to generate
